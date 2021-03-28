@@ -1,61 +1,60 @@
 from textblob import TextBlob
-import nltk
 
 from nltk.corpus import stopwords
 from pathlib import Path
 
 import pandas as pd
-
-blob = TextBlob(Path("RomeoAndJuliet.txt").read_text())
-
-# print(blob.word_counts["juliet"])
-# print(blob.word_counts["romeo"])
-# print(blob.word_counts["thou"])
-# print(blob.words.count("joy"))
-# print(blob.noun_phrases.count("lady capulet"))
-
-stops = stopwords.words("english")
-
-more_stop_words = ["thee", "thy", "thou"]
-stops += more_stop_words
-
-items = blob.word_counts.items()
-# print(items)
-
-items = [item for item in items if item[0] not in stops]
-
-# print(items[:10])
+import collections
+from wordcloud import WordCloud
 
 from operator import itemgetter
 
-sorted_items = sorted(items)
-# print(sorted_items[:10])
+# Read the file
+blob = TextBlob(Path("book of John text.txt").read_text())
 
+# Create a function to hold the boolean for the nouns
+is_noun = lambda pos: pos[:2] == "NN"
+noun_list = [word for (word, word_type) in blob.tags if is_noun(word_type)]
+
+# Create a string to hold the nouns
+noun_words = ""
+
+for i in noun_list:
+    noun_words += i + " "
+
+# Create new Text blob with the noun words
+new_blob = TextBlob(noun_words)
+
+# Remove all stopwords
+stops = stopwords.words("english")
+
+# Add new stop words
+more_stop_words = [
+    "thee",
+    "thy",
+    "thou",
+    "thy",
+    "ye",
+    "verily",
+    "thee",
+    "hath",
+    "say",
+    "thou",
+    "art",
+    "shall",
+]
+stops += more_stop_words
+
+# Count word frequency
+items = new_blob.word_counts.items()
+items = [item for item in items if item[0] not in stops]
+
+# Sort the words based on their frequencies and convert to a dictionary
 sorted_items = sorted(items, key=itemgetter(1), reverse=True)
-# print(sorted_items[:10])
+top_15 = sorted_items[:15]
+top_15_dict = dict(top_15)
 
-top_20 = sorted_items[:20]
-
-# print(top_20)
-
-df = pd.DataFrame(top_20, columns=["words", "count"])
-
-print(df)
-
-import matplotlib.pyplot as plt
-
-df.plot.bar(
-    x="words", y="count", rot=0, legend=False, color=["y", "c", "m", "b", "g", "r"]
-)
-plt.gcf().tight_layout()
-plt.show()
-
-import imageio
-from wordcloud import WordCloud
-
-mask_image = imageio.imread("images\mask_heart.png")
-text = Path("RomeoAndJuliet.txt").read_text()
-
-wordcloud = WordCloud(colormap="prism", mask=mask_image, background_color="white")
-wordcloud = wordcloud.generate(text)
-wordcloud = wordcloud.to_file("RomeoAndJulietHeart.png")
+# Generate the Word cloud based on the top 15 words
+wordcloud = WordCloud(colormap="prism", background_color="gray")
+wordcloud = wordcloud.generate_from_frequencies(top_15_dict)
+wordcloud = wordcloud.to_file("BookOfJohn.png")
