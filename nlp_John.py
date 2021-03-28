@@ -42,6 +42,8 @@ more_stop_words = [
     "thou",
     "art",
     "shall",
+    "saith",
+    "therefore",
 ]
 stops += more_stop_words
 
@@ -55,6 +57,6 @@ top_15 = sorted_items[:15]
 top_15_dict = dict(top_15)
 
 # Generate the Word cloud based on the top 15 words
-wordcloud = WordCloud(colormap="prism", background_color="gray")
+wordcloud = WordCloud(colormap="terrain", background_color="salmon")
 wordcloud = wordcloud.generate_from_frequencies(top_15_dict)
 wordcloud = wordcloud.to_file("BookOfJohn.png")
