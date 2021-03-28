@@ -14,7 +14,7 @@ blob = TextBlob(Path("book of John text.txt").read_text())
 
 # Create a function to hold the boolean for the nouns
 is_noun = lambda pos: pos[:2] == "NN"
-noun_list = [word for (word, word_type) in blob.tags if is_noun(word_type)]
+noun_list = [word.lower() for (word, word_type) in blob.tags if is_noun(word_type)]
 
 # Create a string to hold the nouns
 noun_words = ""
